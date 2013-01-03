@@ -19,7 +19,7 @@ Currently the process relies on pulling boundary data from an [Overpass API](htt
 
 ## Dependencies
 
-- bash
+- Python
 - [PostgreSQL](http://postgresql.org) (tested with 9.2)
 - [PostGIS](http://postgis.refractions.net) (tested with 2.0)
 - [Osmium](http://github.com/joto/osmium/) - make sure `osmjs` is compiled and in your PATH
@@ -27,4 +27,4 @@ Currently the process relies on pulling boundary data from an [Overpass API](htt
 ## Running
 
 1. Adjust database parameters, etc, if necessary at the top of `build.sh`
-2. Run `build.sh`. This will take at least several minutes while the data is downloaded, processed, and imported.
+2. Run `run.py`. This will take at least several minutes while the data is downloaded, processed, and imported. See `run.py --help` for options.
