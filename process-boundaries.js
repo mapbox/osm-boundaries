@@ -88,8 +88,8 @@ Osmium.Callbacks.relation = function() {
 
     if (typeof admin_level === 'number') {
         print(['UPDATE', ways_table, 'SET admin_level =', admin_level,
-              'WHERE osm_id in (', way_ids, ') AND admin_level <', admin_level,
-              ';'].join(' '));
+              'WHERE osm_id in (', way_ids, ') AND (admin_level >',
+              admin_level, 'OR admin_level IS NULL);'].join(' '));
     }
 
     if (this.tags['maritime']) {
