@@ -32,7 +32,6 @@ if __name__ == '__main__':
 
     admin_level = args.min_admin_level
     while admin_level <= args.max_admin_level:
-        print('Retrieving admin_level={0}'.format(admin_level))
 
         # Downloading admin_levels separately gives us some duplicate way data,
         # but its still faster than executing a single complex query.
@@ -40,6 +39,7 @@ if __name__ == '__main__':
         outfile = 'osm_admin_level_{0}.osm'.format(admin_level)
 
         if not os.path.isfile(outfile):
+            print('Retrieving admin_level={0}'.format(admin_level))
 
             query_url = 'http://overpass.osm.rambler.ru/cgi/'
             #query_url = 'http://overpass-api.de/api/' # alternate server
@@ -49,6 +49,8 @@ if __name__ == '__main__':
                     query_url, query_timeout, admin_level)
 
             urlretrieve(query, outfile)
+        else:
+            print('Using existing file for admin_level={0}'.format(admin_level))
 
         admin_level = admin_level + 1
 
