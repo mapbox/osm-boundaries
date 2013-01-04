@@ -86,7 +86,6 @@ Osmium.Callbacks.relation = function() {
     }
 
     if (is_maritime(this.tags)) {
-        // TODO: more tags
         print(['UPDATE', ways_table, 'SET maritime = 1 WHERE osm_id in (',
               way_ids, ');'].join(' '));
     }
