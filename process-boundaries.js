@@ -3,6 +3,37 @@
 
 var ways_table = 'carto_boundary';
 
+is_maritime = function(tags) {
+    if (tags['maritime']) {
+        return 1
+    }
+    var maritime_tags = [
+        'boundary_type',
+        'border_type',
+        'boundary'
+    ];
+    var maritime_vals = [
+        'eez',
+        'maritime',
+        'territorial_waters',
+        'territorial waters'
+    ];
+    for (i = 0; i < maritime_tags.length; i++) {
+        if (maritime_vals.indexOf(tags[maritime_tags[i]]) >= 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+is_disputed = function(tags) {
+    if (tags['disputed'] || tags['dispute']
+        || tags['border_status'] === 'dispute')  {
+        return 1
+    }
+    return 0
+}
+
 Osmium.Callbacks.way = function() {
     // This will import all ways in the OSM file except coastlines. We assume
     // that we are only looking at ways that are members of boundary relations.
@@ -19,36 +50,15 @@ Osmium.Callbacks.way = function() {
         return;
     }
 
-    var maritime = 0;
-    var disputed = 0;
-    var admin_level;
-    var maritime_like = [
-        'eez',
-        'maritime',
-        'territorial_waters',
-        'territorial waters'
-    ];
-    
-    if (this.tags['maritime']) {
-        // TODO: more tags
-        maritime = 1;
-    }
-
-    if (this.tags['disputed'] || this.tags['dispute']
-        || this.tags['border_status'] === 'dispute')  {
-        disputed = 1;
-    }
-
-    print(["SELECT insert_boundary(",this.id, ", ", maritime, ", ", disputed,
-          ", '", geometry, "'::geometry);"].join(""));
+    print(["SELECT insert_boundary(",this.id, ", ", is_maritime(this.tags),
+          ", ", is_disputed(this.tags), ", '", geometry,
+          "'::geometry);"].join(""));
 }
 
 Osmium.Callbacks.relation = function() {
     var rel_id = this.id,
         way_ids = [],
-        admin_level,
-        maritime,
-        disputed;
+        admin_level
 
     try {
         admin_level = parseInt(this.tags['admin_level']);
@@ -75,13 +85,13 @@ Osmium.Callbacks.relation = function() {
               admin_level, 'OR admin_level IS NULL);'].join(' '));
     }
 
-    if (this.tags['maritime']) {
+    if (is_maritime(this.tags)) {
         // TODO: more tags
         print(['UPDATE', ways_table, 'SET maritime = 1 WHERE osm_id in (',
               way_ids, ');'].join(' '));
     }
 
-    if (this.tags['disputed'] || this.tags['dispute']) {
+    if (is_disputed(this.tags)) {
         print(['UPDATE', ways_table, 'SET disputed = 1 WHERE osm_id in (',
               way_ids, ');'].join(' '));
     }
