@@ -1,5 +1,5 @@
 // Usage:
-// osmjs -l sparsetable -j osm-boundaries.js boundaries.osm | psql <dbname>
+// osmjs -l sparsetable -j process-boundaries.js boundaries.osm | psql <dbname>
 
 var ways_table = 'carto_boundary';
 
