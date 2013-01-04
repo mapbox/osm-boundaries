@@ -2,28 +2,8 @@
 // osmjs -l sparsetable -j osm-boundaries.js boundaries.osm | psql <dbname>
 
 var ways_table = 'carto_boundary';
-var started_rels, started_ways;
 
 Osmium.Callbacks.init = function() {
-    // Set up tables
-    print(['CREATE TABLE IF NOT EXISTS', ways_table, '(',
-          'osm_id bigint,',
-          'admin_level smallint,',
-          'maritime smallint,',
-          'disputed smallint,',
-          'geom geometry(Geometry,900913));'].join(' '));
-    print(['ALTER TABLE ONLY ', ways_table, ' ADD CONSTRAINT ', ways_table,
-          '_pkey PRIMARY KEY (osm_id);'].join(''));
-    print(['CREATE OR REPLACE FUNCTION upsert_boundary(',
-          'osm_id int,',
-          'maritime int,',
-          'disputed int,',
-          'geom geometry(Geometry,4326))',
-          'RETURNS VOID LANGUAGE plpgsql AS $$',
-          'BEGIN BEGIN INSERT INTO', ways_table, 
-          'VALUES (osm_id, default, maritime, disputed, st_transform(geom,900913));',
-          'EXCEPTION WHEN unique_violation THEN RETURN; END; END;$$;'].join(' '));
-
 }
 
 Osmium.Callbacks.way = function() {
@@ -62,7 +42,7 @@ Osmium.Callbacks.way = function() {
         disputed = 1;
     }
 
-    print(["SELECT upsert_boundary(",this.id, ", ", maritime, ", ", disputed, 
+    print(["SELECT insert_boundary(",this.id, ", ", maritime, ", ", disputed,
           ", '", geometry, "'::geometry);"].join(""));
 }
 
@@ -84,6 +64,12 @@ Osmium.Callbacks.relation = function() {
             way_ids.push(this.members[i].ref);
         }
     }
+
+    if (way_ids.length === 0) {
+        // relation has no way members, no updates needed
+        return;
+    }
+
     way_ids = way_ids.join(', ');
 
     if (typeof admin_level === 'number') {

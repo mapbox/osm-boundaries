@@ -19,7 +19,7 @@ Currently the process relies on pulling boundary data from an [Overpass API](htt
 
 ## Dependencies
 
-- Python
+- Python & Psycopg2 in a Unixy environment
 - [PostgreSQL](http://postgresql.org) (tested with 9.2)
 - [PostGIS](http://postgis.refractions.net) (tested with 2.0)
 - [Osmium](http://github.com/joto/osmium/) - make sure `osmjs` is compiled and in your PATH
