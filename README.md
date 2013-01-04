@@ -19,12 +19,14 @@ Currently the process relies on pulling boundary data from an [Overpass API](htt
 
 ## Dependencies
 
-- Python & Psycopg2 in a Unixy environment
+- Python & [Psycopg2](http://initd.org/psycopg/docs/) in a Unixy environment
 - [PostgreSQL](http://postgresql.org) (tested with 9.2)
 - [PostGIS](http://postgis.refractions.net) (tested with 2.0)
 - [Osmium](http://github.com/joto/osmium/) - make sure `osmjs` is compiled and in your PATH
 
 ## Running
 
-1. Adjust database parameters, etc, if necessary at the top of `build.sh`
-2. Run `run.py`. This will take at least several minutes while the data is downloaded, processed, and imported. See `run.py --help` for options.
+1. Make sure you have a PostgreSQL database set up with PostGIS enabled.
+2. Run `run.py` with appropriate options set for your database. See `run.py --help` for available options.
+
+The process will take at least several minutes while the data is downloaded, processed, and imported.
