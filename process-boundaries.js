@@ -3,9 +3,6 @@
 
 var ways_table = 'carto_boundary';
 
-Osmium.Callbacks.init = function() {
-}
-
 Osmium.Callbacks.way = function() {
     // This will import all ways in the OSM file except coastlines. We assume
     // that we are only looking at ways that are members of boundary relations.
@@ -88,7 +85,4 @@ Osmium.Callbacks.relation = function() {
         print(['UPDATE', ways_table, 'SET disputed = 1 WHERE osm_id in (',
               way_ids, ');'].join(' '));
     }
-}
-
-Osmium.Callbacks.end = function() {
 }
