@@ -75,7 +75,9 @@ cur.execute('''
         admin_level smallint,
         maritime smallint,
         disputed smallint,
-        geom geometry(Geometry,900913)
+        geom geometry(Geometry,900913),
+        geom_gen1 geometry(Geometry,900913),
+        geom_gen0 geometry(Geometry,900913)
     );'''.format(boundary_table))
 con.commit()
 
@@ -91,9 +93,13 @@ cur.execute('''
     language plpgsql as $$
         begin
             begin
-                insert into {0} values (
+                insert into {0} (
                     osm_id,
-                    default,
+                    maritime,
+                    disputed,
+                    geom
+                ) values (
+                    osm_id,
                     maritime,
                     disputed,
                     st_transform(geom,900913)
@@ -104,9 +110,6 @@ cur.execute('''
         end;
     $$;'''.format(boundary_table))
 con.commit()
-
-cur.close()
-con.close()
 
 
 ## Process & import the boundaries with osmjs
@@ -122,3 +125,17 @@ while admin_level <= args.max_admin_level:
                     shell=True)
 
     admin_level = admin_level + 1
+
+
+## Create simplified geometries
+
+cur.execute('update {0} set geom_gen1 = st_simplify(geom, 200);'.format(
+    boundary_table))
+con.commit()
+
+cur.execute('update {0} set geom_gen0 = st_simplify(geom, 1000);'.format(
+    boundary_table))
+con.commit()
+
+cur.close()
+con.close()
