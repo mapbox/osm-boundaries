@@ -3,13 +3,7 @@
 
 import argparse
 import psycopg2
-import os.path
 import subprocess
-import sys
-if sys.version_info.major >= 3:
-    from urllib.request import urlretrieve
-else:
-    from urllib import urlretrieve
 
 
 ## Arguments & help
@@ -28,42 +22,16 @@ ap.add_argument('-f', dest='min_admin_level', type=int, default=2,
                 help='Minimum admin_level to retrieve.')
 ap.add_argument('-t', dest='max_admin_level', type=int, default=4,
                 help='Maximum admin_level to retrieve.')
+ap.add_argument(dest='osm_input', metavar='planet.osm.pbf',
+                help='An OpenStreetMap PBF file to process.')
 args = ap.parse_args()
-
-
-## Download boundaries from Overpass
-
-admin_level = args.min_admin_level
-
-while admin_level <= args.max_admin_level:
-
-    # Downloading admin_levels separately gives us some duplicate way data,
-    # but its still faster than executing a single complex query.
-
-    outfile = 'osm_admin_level_{0}.osm'.format(admin_level)
-
-    if not os.path.isfile(outfile):
-        print('Retrieving admin_level={0}'.format(admin_level))
-
-        query_url = 'http://overpass.osm.rambler.ru/cgi/'
-        #query_url = 'http://overpass-api.de/api/' # alternate server
-        query_timeout = 86400  # in seconds
-
-        query = '''{0}interpreter?data=[timeout:{1}];(rel[boundary=administrative][admin_level={2}];);(._;way(r);node(w););out+qt;'''.format(
-                query_url, query_timeout, admin_level)
-
-        urlretrieve(query, outfile)
-    else:
-        print('Using existing file for admin_level={0}'.format(admin_level))
-
-    admin_level = admin_level + 1
 
 
 ## PostgreSQL setup
 
 # Set up the db connection
-con = psycopg2.connect("dbname={0} user={1}".format(
-    args.db_name, args.db_user))
+con = psycopg2.connect("dbname={0} user={1} host={2} port={3}".format(
+    args.db_name, args.db_user, args.db_host, args.db_port))
 cur = con.cursor()
 
 # Set up PostgeSQL table
@@ -114,17 +82,36 @@ con.commit()
 
 ## Process & import the boundaries with osmjs
 
-admin_level = args.min_admin_level
+if args.min_admin_level == args.max_admin_level:
+    admin_levels = args.min_admin_level;
+    outfile = 'osm_admin_{0}.osm.pbf'.format(admin_levels)
+elif args.min_admin_level < args.max_admin_level:
+    admin_levels = ','.join(str(i) for i in range(
+                 args.min_admin_level, args.max_admin_level))
+    outfile = 'osm_admin_{0}-{1}.osm.pbf'.format(
+            args.min_admin_level, args.max_admin_level)
+else:
+    print('Error: max admin level cannot be be less than min admin level')
+    exit(1)
 
-while admin_level <= args.max_admin_level:
-    print('Importing admin_level={0}'.format(admin_level))
+subprocess.call(['''osmosis \
+    --read-pbf {0} \
+    --tf accept-relations admin_level={1} \
+    --used-way \
+    --used-node \
+    --write-pbf {2}'''.format(
+        args.osm_input,
+        admin_levels,
+        outfile)],
+    shell=True)
 
-    subprocess.call(['osmjs -l sparsetable -r -j process-boundaries.js osm_admin_level_{0}.osm | psql -h {1} -p {2} -U {3} -d {4} > /dev/null'.format(
-                    admin_level, args.db_host, args.db_port,
-                    args.db_user, args.db_name)],
-                    shell=True)
-
-    admin_level = admin_level + 1
+subprocess.call(['osmjs -l sparsetable -r -j process-boundaries.js {0} | psql -h {1} -p {2} -U {3} -d {4} > /dev/null'.format(
+        outfile,
+        args.db_host,
+        args.db_port,
+        args.db_user,
+        args.db_name)],
+    shell=True)
 
 
 ## Create simplified geometries
