@@ -36,7 +36,7 @@ is_disputed = function(tags) {
 
 Osmium.Callbacks.way = function() {
     // This will import all ways in the OSM file except coastlines. We assume
-    // that we are only looking at ways that are members of boundary relations.
+    // that we are only looking at ways that belong in boundary relations.
 
     // ignore coastlines & closure segments
     if (this.tags['natural'] == 'coastline'
@@ -48,14 +48,19 @@ Osmium.Callbacks.way = function() {
     // Catch failed geometries, skip them
     if (geometry == undefined) {
         return;
+    } else {
+        geometry = ['st_transform(\'', geometry, '\'::geometry, 900913)'].join('');
     }
 
-    print(["SELECT insert_boundary(",this.id, ", ", is_maritime(this.tags),
-          ", ", is_disputed(this.tags), ", '", geometry,
-          "'::geometry);"].join(""));
+    print(['INSERT INTO ', ways_table, ' (osm_id, maritime, disputed, geom) ',
+          'VALUES (', this.id, ', ', is_maritime(this.tags), ', ',
+          is_disputed(this.tags), ', ', geometry, ');'].join(''));
 }
 
 Osmium.Callbacks.relation = function() {
+    // For each relation we check a few key tags, then make any updates to
+    // its way members as necessary.
+
     var rel_id = this.id,
         way_ids = [],
         admin_level

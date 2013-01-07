@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import os.path
 import psycopg2
 import subprocess
 
@@ -49,36 +50,6 @@ cur.execute('''
     );'''.format(boundary_table))
 con.commit()
 
-# Since we have some duplicate way data create a function that will insert
-# the boundaries and fail silently on unique_violation errors.
-cur.execute('''
-    create or replace function insert_boundary(
-        osm_id numeric,
-        maritime numeric,
-        disputed numeric,
-        geom geometry(Geometry,4326))
-    returns void
-    language plpgsql as $$
-        begin
-            begin
-                insert into {0} (
-                    osm_id,
-                    maritime,
-                    disputed,
-                    geom
-                ) values (
-                    osm_id,
-                    maritime,
-                    disputed,
-                    st_transform(geom,900913)
-                );
-            exception
-                when unique_violation then return;
-            end;
-        end;
-    $$;'''.format(boundary_table))
-con.commit()
-
 
 ## Process & import the boundaries with osmjs
 
@@ -94,16 +65,20 @@ else:
     print('Error: max admin level cannot be be less than min admin level')
     exit(1)
 
-subprocess.call(['''osmosis \
-    --read-pbf {0} \
-    --tf accept-relations admin_level={1} \
-    --used-way \
-    --used-node \
-    --write-pbf {2}'''.format(
-        args.osm_input,
-        admin_levels,
-        outfile)],
-    shell=True)
+if os.path.exists(outfile):
+    print('Found existing file {0}; skipping filtering.'.format(outfile))
+else:
+    subprocess.call(['''osmosis \
+        --read-pbf {0} \
+        --tf accept-relations admin_level={1} \
+        --tf accept-relations boundary=administrative \
+        --used-way \
+        --used-node \
+        --write-pbf {2}'''.format(
+            args.osm_input,
+            admin_levels,
+            outfile)],
+        shell=True)
 
 subprocess.call(['osmjs -l sparsetable -r -j process-boundaries.js {0} | psql -h {1} -p {2} -U {3} -d {4} > /dev/null'.format(
         outfile,
