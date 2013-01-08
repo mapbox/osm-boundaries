@@ -1,10 +1,10 @@
 # MapBox OSM Boundaries
 
-This program will download, process, and import OSM boundary relations optimized for rendering. It is mainly intended for (and tested with) boundaries with low `admin_level` values (countries, territories, states, provinces, etc). No polygons are built, allowing different segments of a single boundary to be styled independently. Boundary relation way members are imported as linestrings. They acquire tagging information from their parent relations.
+This program will process and import boundary relations from a OSM PBF file. The process is optimized for rendering - instead of building (multi)polygons, boundary relation way members are imported as unconnected linestrings allowing different segments of a single boundary to be styled independently. This also avoids overlapping lines where different boundaries and admin levels meet, and allows renderers like Mapnik to draw dashed lines correctly.
 
-Currently the process relies on pulling boundary data from an [Overpass API](http://wiki.openstreetmap.org/wiki/Overpass_API) instance.
+### Data processing
 
-### Main features:
+The data is manipulated and simplified for easier styling:
 
 - The lowest `admin_level` value of any of a way's parent relations will be the `admin_level` value of the resulting linestring.
 - Various tag combinations are checked to see if each way is a maritime boundary. This information is simplified to a single `maritime` field with a value of either `0` (false) or `1` (true).
@@ -13,7 +13,7 @@ Currently the process relies on pulling boundary data from an [Overpass API](htt
 - Boundaries that are closure segments (`closure_segment=yes`) are not imported. (Closure segments are ways added at the limits of the projection to close boundaries for valid multipolygon building. They are not actual borders.)
 - Geometries are imported to a Spherical Mercator projection (900913).
 
-### Known issues:
+### Known issues
 
 - boundaries that are not part of any `boundary=administrative` relation are ignored.
 
