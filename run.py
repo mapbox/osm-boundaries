@@ -58,7 +58,7 @@ if args.min_admin_level == args.max_admin_level:
     outfile = 'osm_admin_{0}.osm.pbf'.format(admin_levels)
 elif args.min_admin_level < args.max_admin_level:
     admin_levels = ','.join(str(i) for i in range(
-                 args.min_admin_level, args.max_admin_level))
+                 args.min_admin_level, args.max_admin_level + 1))
     outfile = 'osm_admin_{0}-{1}.osm.pbf'.format(
             args.min_admin_level, args.max_admin_level)
 else:
