@@ -20,6 +20,7 @@ Currently the process relies on pulling boundary data from an [Overpass API](htt
 ## Dependencies
 
 - Python & [Psycopg2](http://initd.org/psycopg/docs/) in a Unixy environment
+- [Osmosis](http://wiki.openstreetmap.org/wiki/Osmosis) (tested with 0.41)
 - [PostgreSQL](http://postgresql.org) (tested with 9.2)
 - [PostGIS](http://postgis.refractions.net) (tested with 2.0)
 - [Osmium](http://github.com/joto/osmium/) - make sure `osmjs` is compiled and in your PATH
@@ -27,6 +28,6 @@ Currently the process relies on pulling boundary data from an [Overpass API](htt
 ## Running
 
 1. Make sure you have a PostgreSQL database set up with PostGIS enabled.
-2. Run `run.py` with appropriate options set for your database. See `run.py --help` for available options.
+2. Run `run.py -f 2 -t 4 data.osm.pbf` with appropriate options set for your database and desired admin levels. See `run.py --help` for available options.
 
 The process will take at least several minutes while the data is downloaded, processed, and imported.
