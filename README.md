@@ -30,4 +30,4 @@ The data is manipulated and simplified for easier styling:
 1. Make sure you have a PostgreSQL database set up with PostGIS enabled.
 2. Run `run.py -f 2 -t 4 data.osm.pbf` with appropriate options set for your database and desired admin levels. See `run.py --help` for available options.
 
-The process will take at least several minutes while the data is downloaded, processed, and imported.
+The process will take quite some time and require lots of free disk space for temporary storage. Processing a full planet file might take over six hours and require at least 60 GB of free disk space.
