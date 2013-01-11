@@ -1,11 +1,11 @@
 // Usage:
 // osmjs -l sparsetable -j process-boundaries.js boundaries.osm | psql <dbname>
 
-var ways_table = 'carto_boundary';
+var ways_table = 'osm_admin_boundary';
 
 is_maritime = function(tags) {
     if (tags['maritime']) {
-        return 1
+        return 1;
     }
     var maritime_tags = [
         'boundary_type',
@@ -29,9 +29,9 @@ is_maritime = function(tags) {
 is_disputed = function(tags) {
     if (tags['disputed'] || tags['dispute']
         || tags['border_status'] === 'dispute')  {
-        return 1
+        return 1;
     }
-    return 0
+    return 0;
 }
 
 Osmium.Callbacks.way = function() {
@@ -48,13 +48,11 @@ Osmium.Callbacks.way = function() {
     // Catch failed geometries, skip them
     if (geometry == undefined) {
         return;
-    } else {
-        geometry = ['st_transform(\'', geometry, '\'::geometry, 900913)'].join('');
     }
 
-    print(['INSERT INTO ', ways_table, ' (osm_id, maritime, disputed, geom) ',
-          'VALUES (', this.id, ', ', is_maritime(this.tags), ', ',
-          is_disputed(this.tags), ', ', geometry, ');'].join(''));
+    print(["INSERT INTO ", ways_table, " VALUES (",
+          this.id, ", null, ", is_maritime(this.tags), ", ",
+          is_disputed(this.tags), ", x'", geometry, "');"].join(""));
 }
 
 Osmium.Callbacks.relation = function() {
