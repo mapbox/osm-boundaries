@@ -20,7 +20,7 @@ The data is manipulated and simplified for easier styling:
 ## Dependencies
 
 - Python & [Psycopg2](http://initd.org/psycopg/docs/) in a Unixy environment
-- [Osmosis](http://wiki.openstreetmap.org/wiki/Osmosis) (tested with 0.41)
+- [Osmosis](http://wiki.openstreetmap.org/wiki/Osmosis) (requires version >=__0.42__ for planet files newer than Feb 9 2013)
 - [PostgreSQL](http://postgresql.org) (tested with 9.2)
 - [PostGIS](http://postgis.refractions.net) (tested with 2.0)
 - [Osmium](http://github.com/joto/osmium/) - make sure `osmjs` is compiled and in your PATH
