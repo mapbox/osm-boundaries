@@ -23,7 +23,8 @@ The data is manipulated and simplified for easier styling:
 - [Osmosis](http://wiki.openstreetmap.org/wiki/Osmosis) (requires version >= __0.42__ for planet files newer than Feb 9 2013)
 - [PostgreSQL](http://postgresql.org) (tested with 9.2)
 - [PostGIS](http://postgis.refractions.net) (tested with 2.0)
-- [Osmium](http://github.com/joto/osmium/) - make sure `osmjs` is compiled and in your PATH
+- [Node.js v0.10.x](http://nodejs.org/) (tested with 0.10.21)
+- [Node-Osmium](https://github.com/osmcode/node-osmium)
 
 ## Running
 

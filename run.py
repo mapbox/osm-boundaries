@@ -80,7 +80,7 @@ else:
             outfile)],
         shell=True)
 
-subprocess.call(['osmjs -l sparsetable -r -j process-boundaries.js {0} | psql -h {1} -p {2} -U {3} -d {4} > /dev/null'.format(
+subprocess.call(['node process-boundaries-node.js {0} | psql -h {1} -p {2} -U {3} -d {4} > /dev/null'.format(
         outfile,
         args.db_host,
         args.db_port,
