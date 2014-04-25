@@ -1,5 +1,5 @@
 // Usage:
-// process-boundaries.js boundaries.osm | psql -U <dbuser> -d <dbname>
+// node process-boundaries.js boundaries.osm | psql -U <dbuser> -d <dbname>
 
 var args = process.argv.slice(2);
 var osmium = require('osmium');
