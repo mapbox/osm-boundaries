@@ -16,6 +16,6 @@
     "url": "https://github.com/mapbox/osm-boundaries/issues"
   },
   "dependencies": {
-    "osmium": "0.1"
+    "osmium": "0.1.1"
   }
 }
