@@ -1,0 +1,21 @@
+{
+  "name": "osm-boundaries",
+  "version": "0.3.0",
+  "description": "This program will process and import boundary relations from a OSM PBF file. The process is optimized for rendering - instead of building (multi)polygons, boundary relation way members are imported as unconnected linestrings allowing different segments of a single boundary to be styled independently. This also avoids overlapping lines where different boundaries and admin levels meet, and allows renderers like Mapnik to draw dashed lines correctly.",
+  "main": "process-boundaries.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mapbox/osm-boundaries.git"
+  },
+  "author": "",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/mapbox/osm-boundaries/issues"
+  },
+  "dependencies": {
+    "osmium": "0.1"
+  }
+}
